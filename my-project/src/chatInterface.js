@@ -7,7 +7,7 @@ const ChatInterface = () => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef(null);
-  const langflowClient = useRef(new LangflowClient('http://127.0.0.1:7860', 'MY9hUpoILW4B6IWnd0OeOxkzV-dgn8sv'));
+  const langflowClient = useRef(new LangflowClient('http://192.168.23.236:7880', 'MY9hUpoILW4B6IWnd0OeOxkzV-dgn8sv'));
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
