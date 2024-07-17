@@ -1,11 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Send } from 'lucide-react';
+import LangflowClient from './LangflowClient'; // Ensure LangflowClient.js is in the same directory or update the import path
 
 const ChatInterface = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef(null);
+  const langflowClient = useRef(new LangflowClient('http://192.168.23.236:7880', 'MY9hUpoILW4B6IWnd0OeOxkzV-dgn8sv'));
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -17,13 +19,32 @@ const ChatInterface = () => {
 
   const handleInputChange = (e) => setInputValue(e.target.value);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (inputValue.trim()) {
       setMessages([...messages, { text: inputValue, isUser: true }]);
+      const userMessage = inputValue;
       setInputValue('');
-      setTimeout(() => {
-        setMessages(prev => [...prev, { text: "Thank you for your message. How can I assist you?", isUser: false }]);
-      }, 1000);
+
+      try {
+        const response = await langflowClient.current.runFlow(
+          '697fb9c8-9f17-46e2-b61d-819c5dd2be61',
+          userMessage,
+          {},
+          false,
+          (data) => console.log("Received:", data.chunk), // onUpdate
+          (message) => console.log("Stream Closed:", message), // onClose
+          (error) => console.log("Stream Error:", error) // onError
+        );
+
+        const flowOutputs = response.outputs[0];
+        const firstComponentOutputs = flowOutputs.outputs[0];
+        const output = firstComponentOutputs.outputs.message;
+
+        setMessages(prev => [...prev, { text: output.message.text, isUser: false }]);
+      } catch (error) {
+        console.error('Error running flow:', error);
+        setMessages(prev => [...prev, { text: 'Error: Unable to get response', isUser: false }]);
+      }
     }
   };
 
