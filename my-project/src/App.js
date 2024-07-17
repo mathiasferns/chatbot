@@ -9,7 +9,7 @@ function App() {
   const [chatbotData, setChatbotData] = useState(null);
 
   useEffect(() => {
-    // Fetch Chatbot_cohere.json data
+    // Fetch Chatbot_cohere.json data abc
     async function fetchChatbotData() {
       try {
         const response = await fetch('/Chatbot_cohere.json'); // Path relative to public folder
